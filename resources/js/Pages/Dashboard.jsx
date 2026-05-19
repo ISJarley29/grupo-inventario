@@ -1,17 +1,23 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
-export default function Dashboard() {
+export default function Dashboard({ auth }) {
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-red-600">
-                    DASHBOARD GENERAL
-                </h2>
-            }
+            user={auth.user}
+            header={<h2 className="font-semibold text-xl text-red-600 leading-tight">DASHBOARD GENERAL</h2>}
         >
             <Head title="Dashboard" />
 
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 text-gray-900">
+                            ¡Bienvenido al sistema de inventario! Selecciona una opción en el menú izquierdo.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </AuthenticatedLayout>
     );
 }
