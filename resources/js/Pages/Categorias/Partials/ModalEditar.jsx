@@ -13,9 +13,9 @@ export default function ModalEditar({ isOpen, onClose, categoria }) {
     useEffect(() => {
         if (categoria) {
             setData({
-                // 🔥 EL SECRETO ESTÁ AQUÍ: Leemos la mayúscula de la BD y la guardamos en la minúscula del state
-                nombre: categoria.Nombre || '',
-                descripcion: categoria.Descripcion || '',
+                // 🌟 CORRECCIÓN: Ahora todo fluye en minúsculas (id, nombre, descripcion)
+                nombre: categoria.nombre || '',
+                descripcion: categoria.descripcion || '',
             });
         }
     }, [categoria, isOpen]);
@@ -23,8 +23,9 @@ export default function ModalEditar({ isOpen, onClose, categoria }) {
     const submit = (e) => {
         e.preventDefault();
 
-        // 🔥 ACTUALIZACIÓN SIN ZIGGY: Usamos la URL directa leyendo el IdCategoria (con mayúscula inicial)
-        put(`/categorias/${categoria.IdCategoria}`, {
+        // 🌟 CORRECCIÓN: Usamos la URL directa leyendo "id" en minúscula
+        // Esto cambia la ruta de /categorias/undefined a /categorias/4
+        put(`/categorias/${categoria.id}`, {
             onSuccess: () => {
                 onClose(); // Cerramos el modal al terminar con éxito
             },

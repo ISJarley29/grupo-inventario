@@ -5,7 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoriaController;
-// Importamos la interfaz del repositorio para poder usarla en la ruta
+// 👇 1. IMPORTA EL CONTROLADOR DE ALMACENES AQUÍ
+use App\Http\Controllers\AlmacenController; 
 use App\Repositories\Contracts\CategoriaRepositoryInterface;
 
 Route::get('/', function () {
@@ -17,7 +18,6 @@ Route::get('/', function () {
     ]);
 });
 
-// Modificamos el dashboard para que use el Repositorio de Categorías
 Route::get('/dashboard', function (CategoriaRepositoryInterface $categoriaRepo) {
     return Inertia::render('Dashboard', [
         'categorias' => $categoriaRepo->obtenerTodas()
@@ -30,7 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-//RUTAS DE LOS CONTROLADORES CONECTADOS A LA BASE DE DATOS
+// RUTAS DE LOS CONTROLADORES CONECTADOS A LA BASE DE DATOS
 Route::resource('categorias', CategoriaController::class);
+// 👇 2. AGREGA LA RUTA RESOURCE PARA ALMACENES
+Route::resource('almacenes', AlmacenController::class);
 
 require __DIR__.'/auth.php';
