@@ -1,5 +1,6 @@
 <?php
-
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -31,12 +32,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// RUTAS DE LOS CONTROLADORES CONECTADOS A LA BASE DE DATOS
 Route::resource('categorias', CategoriaController::class);
 
 Route::resource('almacenes', AlmacenController::class);
 
 Route::resource('unidad-medidas', UnidadMedidaController::class);
+
+Route::get('/usuarios/exportar', function () {
+    return Excel::download(new UsersExport, 'lista_usuarios.xlsx');
+})->middleware('auth')->name('usuarios.export');
 
 Route::resource('usuarios', UserController::class)->middleware('auth');
 
