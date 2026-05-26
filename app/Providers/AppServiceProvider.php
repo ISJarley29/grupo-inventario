@@ -3,11 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-// 1. Importamos las interfaces y clases correspondientes
 use App\Repositories\Contracts\CategoriaRepositoryInterface;
 use App\Repositories\Eloquent\CategoriaRepository;
 use App\Repositories\Contracts\AlmacenRepositoryInterface;
 use App\Repositories\Eloquent\AlmacenRepository;
+use App\Repositories\Contracts\UnidadMedidaRepositoryInterface;
+use App\Repositories\Eloquent\UnidadMedidaRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,9 +19,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // Enlace para Categorías
         $this->app->bind(CategoriaRepositoryInterface::class, CategoriaRepository::class);
-
-        // 🌟 EL ENLACE CORRECTOR: Le decimos a Laravel qué clase usar para los Almacenes
+        // Enlace para Alamacenes
         $this->app->bind(AlmacenRepositoryInterface::class, AlmacenRepository::class);
+        // Enlace para UnidadesdeMedida
+        $this->app->bind(UnidadMedidaRepositoryInterface::class, UnidadMedidaRepository::class);
     }
 
     /**

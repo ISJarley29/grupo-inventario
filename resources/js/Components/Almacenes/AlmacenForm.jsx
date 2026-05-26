@@ -26,18 +26,34 @@ export default function AlmacenForm({ almacenEditando, onSuccess }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (almacenEditando) {
             // Modo Edición: Enviamos al update del controlador
             put(route('almacenes.update', almacenEditando.id), {
-                onSuccess: () => onSuccess(),
+                onSuccess: () => {
+                    reset(); // Vacía los campos del formulario
+                    clearErrors(); // Quita cualquier mensaje rojo de error
+                    onSuccess(); // Le avisa a la tabla (el padre) que ya terminamos de editar
+                },
             });
         } else {
             // Modo Creación: Enviamos al store del controlador
             post(route('almacenes.store'), {
-                onSuccess: () => reset(),
+                onSuccess: () => {
+                    reset();
+                    clearErrors();
+                    // Opcional: Si quieres que al crear también se limpie algún estado en el padre
+                    if (onSuccess) onSuccess();
+                },
             });
         }
+    };
+
+    // Función para el botón Cancelar
+    const handleCancelar = () => {
+        reset();
+        clearErrors();
+        onSuccess(); // Devuelve la pantalla al modo "Crear Almacén"
     };
 
     return (
@@ -45,7 +61,7 @@ export default function AlmacenForm({ almacenEditando, onSuccess }) {
             {/* Campo Nombre */}
             <div>
                 <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                <input 
+                <input
                     type="text"
                     value={data.nombre}
                     onChange={e => setData('nombre', e.target.value)}
@@ -58,7 +74,7 @@ export default function AlmacenForm({ almacenEditando, onSuccess }) {
             {/* Campo Descripción */}
             <div>
                 <label className="block text-sm font-medium text-gray-700">Descripción</label>
-                <textarea 
+                <textarea
                     value={data.descripcion}
                     onChange={e => setData('descripcion', e.target.value)}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
@@ -71,7 +87,7 @@ export default function AlmacenForm({ almacenEditando, onSuccess }) {
             {/* Campo Estado */}
             <div>
                 <label className="block text-sm font-medium text-gray-700">Estado</label>
-                <select 
+                <select
                     value={data.estado ? '1' : '0'}
                     onChange={e => setData('estado', e.target.value === '1')}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
@@ -84,19 +100,19 @@ export default function AlmacenForm({ almacenEditando, onSuccess }) {
 
             {/* Botones de acción */}
             <div className="flex gap-2 pt-2">
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     disabled={processing}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm transition-colors"
+                    className="w-full bg-red-600 hover:bg-red-600 text-white font-bold py-2 px-4 rounded text-sm transition-colors"
                 >
                     {almacenEditando ? 'Actualizar Almacén' : 'Crear Almacén'}
                 </button>
-                
+
                 {almacenEditando && (
-                    <button 
-                        type="button" 
-                        onClick={onSuccess}
-                        className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-sm transition-colors"
+                    <button
+                        type="button"
+                        onClick={handleCancelar}
+                        className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                         Cancelar
                     </button>

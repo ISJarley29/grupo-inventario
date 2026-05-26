@@ -5,8 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoriaController;
-// 👇 1. IMPORTA EL CONTROLADOR DE ALMACENES AQUÍ
-use App\Http\Controllers\AlmacenController; 
+use App\Http\Controllers\AlmacenController;
+use App\Http\Controllers\UnidadMedidaController;
 use App\Repositories\Contracts\CategoriaRepositoryInterface;
 
 Route::get('/', function () {
@@ -32,7 +32,9 @@ Route::middleware('auth')->group(function () {
 
 // RUTAS DE LOS CONTROLADORES CONECTADOS A LA BASE DE DATOS
 Route::resource('categorias', CategoriaController::class);
-// 👇 2. AGREGA LA RUTA RESOURCE PARA ALMACENES
+
 Route::resource('almacenes', AlmacenController::class);
+
+Route::resource('unidad-medidas', UnidadMedidaController::class);
 
 require __DIR__.'/auth.php';

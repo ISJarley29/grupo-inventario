@@ -9,8 +9,7 @@ class AlmacenRepository implements AlmacenRepositoryInterface
 {
     public function all()
     {
-        // Traemos todos, ordenados por los más recientes
-        return Almacen::orderBy('id', 'desc')->get();
+        return Almacen::orderBy('id', 'asc')->get();
     }
 
     public function find($id)
@@ -33,9 +32,8 @@ class AlmacenRepository implements AlmacenRepositoryInterface
     public function delete($id)
     {
         $almacen = $this->find($id);
-        
-        // ELIMINADO LÓGICO: Solo cambiamos el estado a false (0 en DB)
-        $almacen->estado = false; 
+
+        $almacen->estado = false;
         $almacen->save();
 
         return $almacen;

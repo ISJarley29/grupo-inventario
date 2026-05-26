@@ -10,7 +10,7 @@ class StoreAlmacenRequest extends FormRequest
     {
         // Cambia esto a true para permitir que cualquier usuario haga la petición
         // (Más adelante puedes poner lógica de roles aquí si lo necesitas)
-        return true; 
+        return true;
     }
 
     public function rules(): array
@@ -21,7 +21,6 @@ class StoreAlmacenRequest extends FormRequest
         ];
     }
 
-    // OPCIONAL: Puedes personalizar los mensajes de error en español
     public function messages(): array
     {
         return [

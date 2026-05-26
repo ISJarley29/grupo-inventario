@@ -9,12 +9,11 @@ class CategoriaRepository implements CategoriaRepositoryInterface
 {
     public function obtenerTodas()
     {
-        return Categoria::all();
+        return Categoria::orderBy('id', 'asc')->get();
     }
 
     public function buscarPorId($id)
     {
-        // Usamos findOrFail para que lance error 404 automáticamente si no existe
         return Categoria::findOrFail($id);
     }
 

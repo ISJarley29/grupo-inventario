@@ -25,13 +25,13 @@ export default function ModalNueva({ isOpen, onClose }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
             <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
                 <h2 className="mb-4 text-xl font-bold text-gray-800">Registrar Nueva Categoría</h2>
-                
+
                 <form onSubmit={submit}>
-                    <Formulario 
-                        data={data} 
-                        setData={setData} 
-                        errors={errors} 
-                        processing={processing} 
+                    <Formulario
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        processing={processing}
                     />
 
                     <div className="mt-6 flex justify-end gap-3">
@@ -45,7 +45,7 @@ export default function ModalNueva({ isOpen, onClose }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
                         >
                             {processing ? 'Guardando...' : 'Guardar Categoría'}
                         </button>

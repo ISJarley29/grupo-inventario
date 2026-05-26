@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('almacenes', function (Blueprint $table) {
-           $table->id();
-            $table->string('nombre', 100)->unique();
-            $table->string('descripcion')->nullable();
-            $table->boolean('estado')->default(true); // true = Activo, false = Inactivo
+        Schema::create('unidad_medidas', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre', 100);
+            $table->string('abreviatura', 20);
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('almacenes');
+        Schema::dropIfExists('unidad_medidas');
     }
 };

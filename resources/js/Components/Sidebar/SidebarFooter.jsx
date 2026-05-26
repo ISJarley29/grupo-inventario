@@ -1,22 +1,18 @@
-import { Link } from '@inertiajs/react';
-
-export default function SidebarFooter({ isCollapsed, isDarkMode, toggleTheme }) {
+export default function SidebarFooter({ isCollapsed, isDarkMode, toggleTheme, onLogoutClick }) {
     return (
         <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800">
-            <Link
-                href={route('logout')}
-                method="post"
-                as="button"
+            <button
+                type="button"
+                onClick={onLogoutClick}
                 className="flex items-center w-full p-3 mb-2 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-red-400 transition-colors"
-                title={isCollapsed ? "Logout" : ""}
+                title={isCollapsed ? "Cerrar sesión" : ""}
             >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 {!isCollapsed && <span className="ml-4 text-sm font-medium">Cerrar Sesión</span>}
-            </Link>
+            </button>
 
-            {/* Selector de Modo Oscuro */}
             <div className={`flex items-center p-3 bg-gray-100 dark:bg-[#1a1a27] rounded-xl transition-colors ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 {!isCollapsed && (
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
