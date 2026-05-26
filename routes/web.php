@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,5 +35,7 @@ Route::middleware('auth')->group(function () {
 Route::resource('categorias', CategoriaController::class);
 // 👇 2. AGREGA LA RUTA RESOURCE PARA ALMACENES
 Route::resource('almacenes', AlmacenController::class);
+
+Route::resource('usuarios', UserController::class)->middleware('auth');
 
 require __DIR__.'/auth.php';
