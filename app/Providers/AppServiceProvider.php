@@ -10,6 +10,9 @@ use App\Repositories\Eloquent\AlmacenRepository;
 use App\Repositories\Contracts\UnidadMedidaRepositoryInterface;
 use App\Repositories\Eloquent\UnidadMedidaRepository;
 
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Eloquent\UserRepository;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AlmacenRepositoryInterface::class, AlmacenRepository::class);
         // Enlace para UnidadesdeMedida
         $this->app->bind(UnidadMedidaRepositoryInterface::class, UnidadMedidaRepository::class);
+
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 
     /**

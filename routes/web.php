@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,4 +38,7 @@ Route::resource('almacenes', AlmacenController::class);
 
 Route::resource('unidad-medidas', UnidadMedidaController::class);
 
+Route::resource('usuarios', UserController::class)->middleware('auth');
+
 require __DIR__.'/auth.php';
+
