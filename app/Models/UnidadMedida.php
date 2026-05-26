@@ -5,17 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categoria extends Model
+class UnidadMedida extends Model
 {
     use HasFactory;
 
-   
+    protected $table = 'unidad_medidas';
 
-    /**
-     * Los atributos que se pueden asignar masivamente.
-     */
     protected $fillable = [
         'nombre',
-        'descripcion',
+        'abreviatura',
     ];
 }
