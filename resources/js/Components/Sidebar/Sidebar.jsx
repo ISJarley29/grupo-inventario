@@ -31,52 +31,63 @@ export default function Sidebar({ user }) {
         router.post(route('logout'));
     };
 
+    // 1. AÑADIMOS allowedRoles A CADA MENÚ
     const menuItems = [
         {
             label: 'Dashboard',
             routeName: route('dashboard'),
             active: route().current('dashboard'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>,
+            allowedRoles: ['admin'] // Solo Admin
         },
         {
             label: 'Unidades de Medida',
             routeName: route('unidad-medidas.index'),
             active: route().current('unidad-medidas.index'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>,
+            allowedRoles: ['admin', 'docente'] // Admin y Docente
         },
         {
             label: 'Usuarios',
             routeName: route('usuarios.index'),
             active: route().current('usuarios.*'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>,
+            allowedRoles: ['admin'] // Solo Admin
         },
         {
             label: 'Turnos',
             routeName: route('turnos.index'),
             active: route().current('turnos.*'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
+            allowedRoles: ['admin', 'docente'] // Admin y Docente
         },
-        // 👇 NUEVO MÓDULO DE PRODUCTOS 👇
         {
             label: 'Productos',
             routeName: route('productos.index'),
             active: route().current('productos.*'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg> // Ícono de caja/paquete
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>,// Ícono de caja/paquete
+            allowedRoles: ['admin', 'docente'] // Admin y Docente
         },
-        // 👆 FIN DEL MÓDULO DE PRODUCTOS 👆
         {
             label: 'Categorias',
             routeName: route('categorias.index'),
-            active: route().current('categorias.*'), // Actualizado a .* por si tienes sub-rutas de edición/creación
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            active: route().current('categorias.index'),
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>,
+            allowedRoles: ['admin', 'docente', 'estudiante'] // Todos
         },
         {
             label: 'Almacenes',
             routeName: route('almacenes.index'),
             active: route().current('almacenes.*'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>,
+            allowedRoles: ['admin', 'docente', 'estudiante'] // Todos
         },
     ];
+
+    // 2. FILTRAMOS LOS MENÚS SEGÚN EL ROL DEL USUARIO
+    const filteredMenuItems = menuItems.filter(item =>
+        user && user.role && item.allowedRoles.includes(user.role)
+    );
 
     return (
         <>
@@ -104,7 +115,8 @@ export default function Sidebar({ user }) {
                 </div>
 
                 <ul className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
-                    {menuItems.map((item, index) => (
+                    {/* 3. DIBUJAMOS SOLO LOS MENÚS FILTRADOS */}
+                    {filteredMenuItems.map((item, index) => (
                         <SidebarMenuItem
                             key={index}
                             label={item.label}

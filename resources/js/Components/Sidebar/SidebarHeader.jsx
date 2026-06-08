@@ -1,5 +1,4 @@
 import React from 'react';
-import logoCefop from '../../../imagenes/logo.png';
 
 export default function SidebarHeader({ user, isCollapsed }) {
     return (
@@ -7,7 +6,7 @@ export default function SidebarHeader({ user, isCollapsed }) {
 
             <div className="flex items-center justify-center w-12 h-12 min-w-[48px]">
                 <img
-                    src={logoCefop}
+                    src="\logo.png"
                     alt="Logo CEFOP"
                     className="w-full h-full object-contain"
                 />

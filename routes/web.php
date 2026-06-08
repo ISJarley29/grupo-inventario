@@ -1,11 +1,11 @@
 <?php
+
 use App\Exports\UsersExport;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\TurnoController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoriaController;
@@ -13,43 +13,48 @@ use App\Http\Controllers\AlmacenController;
 use App\Http\Controllers\UnidadMedidaController;
 use App\Repositories\Contracts\CategoriaRepositoryInterface;
 
+// Redirección inicial
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect()->route('login');
 });
 
-Route::get('/dashboard', function (CategoriaRepositoryInterface $categoriaRepo) {
-    return Inertia::render('Dashboard', [
-        'categorias' => $categoriaRepo->obtenerTodas()
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ==============================================================================
+// 🔒 TODAS ESTAS RUTAS REQUIEREN QUE EL USUARIO HAYA INICIADO SESIÓN (auth)
+// ==============================================================================
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::middleware('auth')->group(function () {
+    // 🟢 NIVEL 1: ACCESO PARA TODOS (Admin, Docente, Estudiante)
+    Route::get('/dashboard', function (CategoriaRepositoryInterface $categoriaRepo) {
+        return Inertia::render('Dashboard', [
+            'categorias' => $categoriaRepo->obtenerTodas()
+        ]);
+    })->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Recursos básicos
+    Route::resource('categorias', CategoriaController::class);
+    Route::resource('almacenes', AlmacenController::class);
+    Route::resource('productos', ProductoController::class);
+    Route::resource('turnos', TurnoController::class);
+
+    // 🟡 NIVEL 2: ACCESO SOLO PARA ADMIN Y DOCENTE
+    Route::middleware(['role:admin,docente'])->group(function () {
+        Route::resource('unidad-medidas', UnidadMedidaController::class);
+    });
+
+    // 🔴 NIVEL 3: ACCESO ESTRICTO SOLO PARA ADMIN
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('usuarios', UserController::class);
+
+        Route::get('/usuarios/exportar', function () {
+            return Excel::download(new UsersExport, 'lista_usuarios.xlsx');
+        })->name('usuarios.export');
+    });
+
 });
 
-Route::resource('categorias', CategoriaController::class);
-
-Route::resource('almacenes', AlmacenController::class);
-
-Route::resource('unidad-medidas', UnidadMedidaController::class);
-
-Route::get('/usuarios/exportar', function () {
-    return Excel::download(new UsersExport, 'lista_usuarios.xlsx');
-})->middleware('auth')->name('usuarios.export');
-
-Route::resource('usuarios', UserController::class)->middleware('auth');
-
-Route::resource('productos', ProductoController::class)->middleware('auth');
-
-// 🔥 Nueva ruta para el módulo de Turnos
-Route::resource('turnos', TurnoController::class)->middleware('auth');
-
+// Archivo de rutas de autenticación (Login, registro, etc)
 require __DIR__.'/auth.php';
-
