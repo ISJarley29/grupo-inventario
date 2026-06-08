@@ -1,5 +1,7 @@
 <?php
 use App\Exports\UsersExport;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\TurnoController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -43,6 +45,11 @@ Route::get('/usuarios/exportar', function () {
 })->middleware('auth')->name('usuarios.export');
 
 Route::resource('usuarios', UserController::class)->middleware('auth');
+
+Route::resource('productos', ProductoController::class)->middleware('auth');
+
+// 🔥 Nueva ruta para el módulo de Turnos
+Route::resource('turnos', TurnoController::class)->middleware('auth');
 
 require __DIR__.'/auth.php';
 

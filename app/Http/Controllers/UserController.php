@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Http\Requests\StoreUserRequest;
 use Illuminate\Http\Request;
@@ -17,12 +17,39 @@ class UserController extends Controller
         $this->userRepo = $userRepo;
     }
 
-    public function index()
-    {
-        return Inertia::render('Usuarios/Index', [
-            'usuarios' => $this->userRepo->obtenerTodos()
-        ]);
-    }
+    public function index(Request $request)
+{
+    // Iniciamos la query apuntando a la tabla 'users'
+    $query = User::query();
+
+    // Filtro por Nombre (columna 'name')
+    $query->when($request->input('name'), function ($q, $name) {
+        $q->where('name', 'like', '%' . $name . '%');
+    });
+
+    // Filtro por email (columna 'email')
+    $query->when($request->input('email'), function ($q, $email) {
+        $q->where('email', 'like', '%' . $email . '%');
+    });
+
+    // Filtro por Rol (columna 'role')
+    $query->when($request->input('role'), function ($q, $role) {
+        $q->where('role', $role);
+    });
+
+    // Filtro por Estado (columna 'status')
+    $query->when($request->filled('status'), function ($q) use ($request) {
+        $q->where('status', $request->input('status'));
+    });
+
+    // Obtenemos los usuarios filtrados
+    $usuarios = $query->get();
+
+    return Inertia::render('Usuarios/Index', [
+        'usuarios' => $usuarios,
+        'filtros' => $request->only(['name', 'email', 'role', 'status'])
+    ]);
+}
 
     public function create()
     {

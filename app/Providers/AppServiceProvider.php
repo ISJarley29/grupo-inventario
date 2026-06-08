@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\ProductoRepositoryInterface;
+use App\Repositories\Eloquent\ProductoRepository;
+use App\Repositories\Contracts\TurnoRepositoryInterface;
+use App\Repositories\Eloquent\TurnoRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\CategoriaRepositoryInterface;
 use App\Repositories\Eloquent\CategoriaRepository;
@@ -26,8 +30,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AlmacenRepositoryInterface::class, AlmacenRepository::class);
         // Enlace para UnidadesdeMedida
         $this->app->bind(UnidadMedidaRepositoryInterface::class, UnidadMedidaRepository::class);
-
+        // 2. Registramos el nuevo repositorio de Productos
+        $this->app->bind(ProductoRepositoryInterface::class, ProductoRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(TurnoRepositoryInterface::class, TurnoRepository::class);
     }
 
     /**

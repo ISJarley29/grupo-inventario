@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import BusquedaAvanzadaModal from './BusquedaAvanzadaModal';
 
-export default function Index({ auth, usuarios: usuariosBackend }) {
-    // ESTADOS DEL DRAWER Y MODO EDICIÓN
+export default function Index({ auth, usuarios: usuariosBackend, filtros: filtrosServer }) {
+    // ESTADOS DE MODALES Y DRAWER
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingUserId, setEditingUserId] = useState(null);
 
-    // MOCK DATA (Se usa si el backend aún no envía datos)
+    // MOCK DATA (Soporte por si el backend no envía datos momentáneamente)
     const mockUsuarios = [
         { id: 1, name: 'Ana Silva', email: 'ana.silva@sistema.com', role: 'admin', status: true },
         { id: 2, name: 'Carlos Gomez', email: 'carlos.gomez@sistema.com', role: 'docente', status: true },
         { id: 3, name: 'Luis Ramirez', email: 'luis.ram@sistema.com', role: 'estudiante', status: false },
     ];
 
-    const usuarios = usuariosBackend?.length > 0 ? usuariosBackend : mockUsuarios;
+    // NORMALIZACIÓN DE ATRIBUTOS (Evita columnas vacías correlacionando Español e Inglés)
+    const dataOrigen = usuariosBackend?.length > 0 ? usuariosBackend : mockUsuarios;
+    const usuarios = dataOrigen.map((user) => ({
+        id: user.id || user.IdUsuarios || user.idUsuarios,
+        name: user.nombre || user.Nombre || user.name || 'Usuario',
+        email: user.email || '',
+        role: user.rol || user.Rol || user.role || '—',
+        status: user.estado !== undefined 
+            ? (user.estado === true || user.estado === 1 || user.estado === 'Activo') 
+            : (user.status ?? true)
+    }));
+
+    // MANEJO DE FILTROS ACTIVOS (Vienen del servidor o estado local)
+    const filtros = filtrosServer || { name: '', email: '', role: '', status: '' };
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         name: '',
@@ -77,37 +92,87 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
         }
     };
 
+    const handleQuitarFiltro = (campo) => {
+        const nuevosFiltros = { ...filtros, [campo]: '' };
+        router.get(route('usuarios.index'), nuevosFiltros, { preserveState: true });
+    };
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Gestión de Usuarios" />
 
             <div className="min-h-screen bg-gray-50 p-8 dark:bg-[#11111d]">
-
+                
                 {/* ENCABEZADO Y BOTONES SUPERIORES */}
-                <div className="mb-8 flex items-center justify-between">
+                <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Usuarios</h1>
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Gestiona los accesos y roles del sistema.</p>
                     </div>
 
-                    <div className="flex space-x-3">
-                        {/* BOTÓN DE DESCARGA EXCEL CORREGIDO */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* BOTÓN BÚSQUEDA AVANZADA */}
+                        <button
+                            onClick={() => setIsSearchModalOpen(true)}
+                            className="flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                        >
+                            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Búsqueda avanzada
+                        </button>
+
+                        {/* BOTÓN EXCEL */}
                         <a
                             href={route('usuarios.export')}
                             className="flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-700"
                         >
-                            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
                             Descargar en Excel
                         </a>
 
+                        {/* BOTÓN NUEVO USUARIO */}
                         <button
                             onClick={openCreateDrawer}
-                            className="flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-600"
+                            className="flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700"
                         >
-                            + Agregar Usuario
+                            <span className="mr-1 text-base font-bold">+</span> Agregar Usuario
                         </button>
                     </div>
                 </div>
+
+                {/* VISUALIZACIÓN DE FILTROS ACTIVOS */}
+                {(filtros.name || filtros.email || filtros.role || filtros.status) && (
+                    <div className="mb-4 flex flex-wrap gap-2 items-center">
+                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-1">Filtros:</span>
+                        {filtros.name && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400">
+                                Nombre: {filtros.name}
+                                <button onClick={() => handleQuitarFiltro('name')} className="ml-1 text-blue-500 hover:text-blue-700 font-bold">×</button>
+                            </span>
+                        )}
+                        {filtros.email && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400">
+                                Email: {filtros.email}
+                                <button onClick={() => handleQuitarFiltro('email')} className="ml-1 text-blue-500 hover:text-blue-700 font-bold">×</button>
+                            </span>
+                        )}
+                        {filtros.role && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400">
+                                Rol: {filtros.role}
+                                <button onClick={() => handleQuitarFiltro('role')} className="ml-1 text-blue-500 hover:text-blue-700 font-bold">×</button>
+                            </span>
+                        )}
+                        {filtros.status && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400">
+                                Estado: {filtros.status === '1' ? 'Activo' : 'Inactivo'}
+                                <button onClick={() => handleQuitarFiltro('status')} className="ml-1 text-blue-500 hover:text-blue-700 font-bold">×</button>
+                            </span>
+                        )}
+                    </div>
+                )}
 
                 {/* TABLA DE DATOS */}
                 <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-[#1a1a27] dark:ring-gray-800">
@@ -122,80 +187,82 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#1a1a27]">
-                            {usuarios.map((user) => (
-                                <tr key={user.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                    <td className="whitespace-nowrap px-6 py-4">
-                                        <div className="flex items-center">
-                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-200">
-                                                {user.name.charAt(0).toUpperCase()}
+                            {usuarios.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        Sin resultados para los filtros aplicados
+                                    </td>
+                                end</tr>
+                            ) : (
+                                usuarios.map((user) => (
+                                    <tr key={user.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                        <td className="whitespace-nowrap px-6 py-4">
+                                            <div className="flex items-center">
+                                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-200">
+                                                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                                                </div>
                                             </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                        {user.email}
-                                    </td>
-                                    <td className="whitespace-nowrap px-6 py-4">
-                                        <span className="text-sm capitalize text-gray-600 dark:text-gray-300">
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="whitespace-nowrap px-6 py-4">
-                                        <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                            user.status
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                        }`}>
-                                            {user.status ? 'Activo' : 'Inactivo'}
-                                        </span>
-                                    </td>
-                                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                        <div className="flex justify-end space-x-2">
-                                            <button
-                                                onClick={() => openEditDrawer(user)}
-                                                className="flex items-center rounded-md bg-green-50 px-2 py-1.5 text-green-600 transition-colors hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
-                                                title="Editar Usuario"
-                                            >
-                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
-                                                Editar
-                                            </button>
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                            {user.email}
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4">
+                                            <span className="text-sm capitalize text-gray-600 dark:text-gray-300">
+                                                {user.role}
+                                            </span>
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4">
+                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                                user.status
+                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                            }`}>
+                                                {user.status ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                            <div className="flex justify-end space-x-2">
+                                                <button
+                                                    onClick={() => openEditDrawer(user)}
+                                                    className="flex items-center rounded-md bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-600 transition-colors hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+                                                    title="Editar Usuario"
+                                                >
+                                                    <svg className="mr-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
+                                                    Editar
+                                                </button>
 
-                                            <button
-                                                onClick={() => handleDarDeBaja(user)}
-                                                disabled={!user.status}
-                                                className={`flex items-center rounded-md px-2 py-1.5 transition-colors ${
-                                                    user.status
-                                                        ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40'
-                                                        : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-                                                }`}
-                                                title={user.status ? "Dar de baja" : "Usuario inactivo (Activar desde edición)"}
-                                            >
-                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
-                                                {user.status ? 'Dar de baja' : 'Inactivo'}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                                <button
+                                                    onClick={() => handleDarDeBaja(user)}
+                                                    disabled={!user.status}
+                                                    className={`flex items-center rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                                                        user.status
+                                                            ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40'
+                                                            : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+                                                    }`}
+                                                    title={user.status ? "Dar de baja" : "Usuario inactivo"}
+                                                >
+                                                    <svg className="mr-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
+                                                    Dar de baja
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
 
-                {/* DRAWER LATERAL */}
+                {/* DRAWER LATERAL (CREACIÓN / EDICIÓN) */}
                 {isDrawerOpen && (
                     <div className="relative z-50">
-                        {/* Backdrop Oscuro */}
-                        <div
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                            onClick={closeDrawer}
-                        ></div>
-
-                        {/* Panel */}
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={closeDrawer}></div>
                         <div className="fixed inset-y-0 right-0 flex w-full max-w-md transform flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:bg-[#1a1a27]">
                             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
-                                <h2 className={`text-lg font-semibold ${isEditing ? 'text-red-600' : 'text-red-600 dark:text-white'}`}>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                                     {isEditing ? 'Actualizar Usuario' : 'Registrar Usuario'}
                                 </h2>
                                 <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -203,10 +270,8 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
                                 </button>
                             </div>
 
-                            {/* FORMULARIO INERTIA */}
                             <div className="flex-1 overflow-y-auto p-6">
-                                <form onSubmit={submitForm} className="space-y-5">
-
+                                <form onSubmit={submitForm} id="drawer-form" className="space-y-5">
                                     <div>
                                         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Completo</label>
                                         <input
@@ -233,7 +298,7 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
 
                                     <div>
                                         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Contraseña {isEditing && <span className="text-xs text-gray-400 font-normal">(Dejar en blanco para no cambiar)</span>}
+                                            Contraseña {isEditing && <span className="text-xs font-normal text-gray-400">(Dejar en blanco para conservar)</span>}
                                         </label>
                                         <input
                                             type="password"
@@ -272,11 +337,9 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
                                         </select>
                                         {errors.status && <div className="mt-1 text-xs font-semibold text-red-500">{errors.status}</div>}
                                     </div>
-
                                 </form>
                             </div>
 
-                            {/* FOOTER DEL DRAWER */}
                             <div className="border-t border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-[#1a1a27]">
                                 <div className="flex justify-end space-x-3">
                                     <button
@@ -287,23 +350,26 @@ export default function Index({ auth, usuarios: usuariosBackend }) {
                                         Cancelar
                                     </button>
                                     <button
-                                        type="button"
-                                        onClick={submitForm}
+                                        type="submit"
+                                        form="drawer-form"
                                         disabled={processing}
-                                        className={`rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm disabled:opacity-50 ${
-                                            isEditing
-                                                ? 'bg-red-600 hover:bg-red-600'
-                                                : 'bg-red-600 hover:bg-red-600'
-                                        }`}
+                                        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700 disabled:opacity-50"
                                     >
                                         {processing ? 'Procesando...' : (isEditing ? 'Actualizar' : 'Guardar Usuario')}
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 )}
+
+                {/* MODAL DE BÚSQUEDA AVANZADA COMPONENTE EXTERNO */}
+                <BusquedaAvanzadaModal 
+                    isOpen={isSearchModalOpen} 
+                    onClose={() => setIsSearchModalOpen(false)} 
+                    filtrosAnteriores={filtros}
+                />
+
             </div>
         </AuthenticatedLayout>
     );
