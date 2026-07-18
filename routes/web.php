@@ -3,6 +3,7 @@
 use App\Exports\UsersExport;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\MovimientoController; // 👈 Importación del nuevo controlador
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -39,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('almacenes', AlmacenController::class);
     Route::resource('productos', ProductoController::class);
     Route::resource('turnos', TurnoController::class);
+    
+    // 👈 Ruta de Movimientos (Solo permitimos ver el historial y registrar nuevos)
+    Route::resource('movimientos', MovimientoController::class)->only(['index', 'store']);
 
     // 🟡 NIVEL 2: ACCESO SOLO PARA ADMIN Y DOCENTE
     Route::middleware(['role:admin,docente'])->group(function () {

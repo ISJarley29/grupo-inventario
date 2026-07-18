@@ -34,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductoRepositoryInterface::class, ProductoRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(TurnoRepositoryInterface::class, TurnoRepository::class);
+
+        $this->app->bind(\App\Repositories\Contracts\MovimientoRepositoryInterface::class, \App\Repositories\Eloquent\MovimientoRepository::class);
     }
 
     /**

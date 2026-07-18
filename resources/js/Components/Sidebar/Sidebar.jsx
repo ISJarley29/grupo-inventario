@@ -65,7 +65,14 @@ export default function Sidebar({ user }) {
             label: 'Productos',
             routeName: route('productos.index'),
             active: route().current('productos.*'),
-            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>,// Ícono de caja/paquete
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>,
+            allowedRoles: ['admin', 'docente'] // Admin y Docente
+        },
+        {
+            label: 'Movimientos',
+            routeName: route('movimientos.index'),
+            active: route().current('movimientos.*'),
+            icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>,
             allowedRoles: ['admin', 'docente'] // Admin y Docente
         },
         {
